@@ -1,8 +1,7 @@
 local utils = require('last-session.utils')
-local init = require('last-session')
+local config = require('last-session.config')
 
 local M = {}
-local config = init.config
 
 -- Save current opened buffer list
 M.save_session = function()
