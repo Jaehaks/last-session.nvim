@@ -32,7 +32,7 @@ M.save_session = function()
 	if success then
 		print('Session saved to ' .. session_file)
 	else
-		print('Error: Could not write to session file')
+		vim.api.nvim_echo({{'Error: Could not write to session file'}}, false, {err = true})
 	end
 end
 
@@ -49,10 +49,10 @@ M.restore_session = function()
 				end
 			end
 		else
-			print('Error: Could not read session file')
+			vim.api.nvim_echo({{'Error: Could not read session file'}}, false, {err = true})
 		end
 	else
-		print('No session file found at ' .. session_file)
+		vim.api.nvim_echo({{'No session file found at ' .. session_file}}, false, {err = true})
 	end
 end
 
