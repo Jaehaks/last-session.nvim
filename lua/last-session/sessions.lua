@@ -25,6 +25,17 @@ M.save_session = function()
 		end
 	end
 
+	-- change separator depends on OS
+	local isWin = vim.fn.has('win32')
+	local sep1, sep2 = '\\', '/'
+	if isWin == 1 then
+		sep1, sep2 = '/', '\\'
+	end
+
+	for i, file in ipairs(file_list) do
+		file_list[i] = file:gsub(sep1, sep2)
+	end
+
 	local success = pcall(function()
 		vim.fn.writefile(file_list, session_file)
 	end)
