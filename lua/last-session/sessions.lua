@@ -1,14 +1,15 @@
-local utils = require('last-session.utils')
 local config = require('last-session.config')
+local utils = require('last-session.utils')
 
 local M = {}
 
 -- Save current opened buffer list
 M.save_session = function()
+	local options = config.get_config()
 
 	-- check session_file is existed and make it if not
-	local session_dir = vim.fn.fnamemodify(config.path, ':h')
-	local session_file = config.path
+	local session_dir = vim.fn.fnamemodify(options.path, ':h')
+	local session_file = options.path
 	utils.check_dir(session_dir)
 
 
@@ -48,8 +49,9 @@ M.save_session = function()
 end
 
 -- Restore last session
-M.restore_session = function()
-	local session_file = config.path
+M.load_session = function()
+	local options = config.get_config()
+	local session_file = options.path
 
 	if vim.fn.filereadable(session_file) == 1 then
 		local files = vim.fn.readfile(session_file)

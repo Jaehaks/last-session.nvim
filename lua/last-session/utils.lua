@@ -12,24 +12,25 @@ end
 
 -- Function to check whether a file is to be ignored
 M.filter_ignored = function(bufnr)
+	local options = config.get_config()
 	local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
 	local file_type = vim.api.nvim_get_option_value('filetype', { buf = bufnr }) -- get filetype
 
-	if not config then return nil end
+	if not options then return nil end
 
 	-- if ext of file is included in ignored_type
 	local ext = file_path:match('%.([^%.]+)$')
-	if ext and vim.tbl_contains(config.ignored_list.ignored_type, ext) then
+	if ext and vim.tbl_contains(options.ignored_list.ignored_type, ext) then
 		return nil
 	end
 
 	-- if filetype of file is included in ignored_type
-	if file_type and vim.tbl_contains(config.ignored_list.ignored_type, file_type) then
+	if file_type and vim.tbl_contains(options.ignored_list.ignored_type, file_type) then
 		return nil
 	end
 
 	-- Check directory pattern
-	for _, dir in ipairs(config.ignored_list.ignored_dir) do
+	for _, dir in ipairs(options.ignored_list.ignored_dir) do
 		if file_path:find(dir, 1, true) then
 			return nil
 		end
