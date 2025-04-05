@@ -3,6 +3,13 @@ local utils = require('last-session.utils')
 
 local M = {}
 
+-- change separator depends on OS
+local isWin = vim.fn.has('win32')
+local sep1, sep2 = '\\', '/'
+if isWin == 1 then
+	sep1, sep2 = '/', '\\'
+end
+
 -- Save current opened buffer list
 M.save_session = function()
 	local options = config.get_config()
@@ -26,13 +33,7 @@ M.save_session = function()
 		end
 	end
 
-	-- change separator depends on OS
-	local isWin = vim.fn.has('win32')
-	local sep1, sep2 = '\\', '/'
-	if isWin == 1 then
-		sep1, sep2 = '/', '\\'
-	end
-
+	-- unify the separator
 	for i, file in ipairs(file_list) do
 		file_list[i] = file:gsub(sep1, sep2)
 	end
