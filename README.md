@@ -30,7 +30,7 @@ It is still developing, so I'll fix it continuously until I satisfied.
 -- This is default configuration
 opts = {
 	auto_save    = false,     -- save last session automatically when VimLeave
-	path         = vim.fn.stdpath('data') .. '/last-session/last-session.txt',
+	path         = vim.fn.stdpath('data') .. '/last-session/last-session.json',
 	ignored_list = {
 		ignored_type = {},    -- List of file extensions or filetypes to ignore
 		ignored_dir  = {},    -- List of directory path patterns to ignore
