@@ -80,7 +80,7 @@ M.load_session = function()
 	for _, file_data in ipairs(session_data) do
 		if vim.fn.filereadable(file_data.path) == 1 then
 			-- edit only focused file to fast load
-			local cmd_open = file_data.focused == 1 and 'edit' or 'badd'
+			local cmd_open = file_data.focused == 1 and 'edit ' or 'badd '
 			vim.cmd(cmd_open .. vim.fn.fnameescape(file_data.path))
 		end
 	end
