@@ -1,5 +1,15 @@
 # ChnageLog
 
+## 2025-04-20
+
+### Features
+- Session file's contents can be shown in neovim using `:LastSessionView` command. [d35e889](https://github.com/Jaehaks/last-session.nvim/commit/d35e889e8a5db1460ea60a0ade4a116227cfd7ba)
+- Remove empty buffer list in session file. [702af08](https://github.com/Jaehaks/last-session.nvim/commit/702af0850529c51611256d848b6edbf1cbd96742)
+
+### Added
+- Add "API" section to README. [fc73afe](https://github.com/Jaehaks/last-session.nvim/commit/fc73afefe9b306d6c5a39921a7489a8ca2be7693)
+
+
 ## 2025-04-19
 
 ### Features
