@@ -53,4 +53,15 @@ It is table which includes filetype, extension or directory string pattern to ig
 	}
 ```
 
+## API / Command
+
+### API
+
+`session = require('last-session').save_session()`
+
+|           API            | behavior                           |
+| :----------------------: | ---------------------------------- |
+| `session.save_session()` | Save current tab session to file   |
+| `session.load_session()` | Load current tab session from file |
+
 
