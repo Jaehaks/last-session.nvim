@@ -18,6 +18,11 @@ M.filter_ignored = function(bufnr)
 
 	if not options then return nil end
 
+	-- Remove empty file path
+	if #file_path < 1 then
+		return nil
+	end
+
 	-- if ext of file is included in ignored_type
 	local ext = file_path:match('%.([^%.]+)$')
 	if ext and vim.tbl_contains(options.ignored_list.ignored_type, ext) then
