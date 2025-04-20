@@ -158,6 +158,15 @@ M.view_session = function ()
 		output[i] = line:gsub('\r', '')
 	end
 
+    -- create new buffer
+	vim.cmd('tabnew') -- [No Name] buffer is created after new tab
+	local winid = vim.api.nvim_get_current_win()
+	local old_bufnr = vim.api.nvim_get_current_buf()
+    local bufnr = vim.api.nvim_create_buf(false, true) -- scratched buffer, nobuflisted
+    vim.api.nvim_buf_set_name(bufnr, '[View] ' .. vim.fn.fnamemodify(session_file, ':~'))
+	vim.api.nvim_win_set_buf(winid, bufnr)
+	vim.api.nvim_buf_delete(old_bufnr, {force = true})
+
     -- write the contents to buffer
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, output)
 	vim.api.nvim_set_option_value('filetype', 'json', { buf = bufnr })
@@ -167,7 +176,7 @@ M.view_session = function ()
 	vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })
 
     -- set new keymap for current buffer
-    vim.keymap.set('n', 'q', ':bd<CR>', { buffer = bufnr, noremap = true, silent = true })
+    vim.keymap.set('n', 'q', ':tabclose<CR>', { buffer = bufnr, noremap = true, silent = true })
 end
 
 
