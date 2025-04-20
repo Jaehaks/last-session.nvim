@@ -30,11 +30,28 @@ M.save_session = function()
 		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr}) then -- check the buffer is opened
 			local file_path = utils.filter_ignored(bufnr)
 			if file_path then
+				-- get window information
+				local winid   = vim.fn.bufwinid(bufnr)
+				local cursor  = {1, 0}
+				local topline = 1
+				if winid >= 0 then                              -- if the window is visible
+					cursor  = vim.api.nvim_win_get_cursor(winid) -- get current cursor location {row, col-1}
+					topline = vim.fn.line('w0',winid)           -- get current top line number
+				end
+
+				-- save buffer information
 				local file_data = { -- window data of opened buffer
 					bufnr   = bufnr,
+					winid   = winid,
 					focused = bufnr == focused_bufnr and 1 or 0,
-					path    = file_path:gsub(sep1, sep2) -- unify the separator
+					path    = file_path:gsub(sep1, sep2), -- unify the separator
+					cursor  = {
+						line = cursor[1],
+						col  = cursor[2],
+					},
+					topline = topline,
 				}
+
 				if file_data.focused == 1 then
 					has_focused = true
 				end
@@ -91,6 +108,12 @@ M.load_session = function()
 			-- edit only focused file to fast load
 			local cmd_open = file_data.focused == 1 and 'edit ' or 'badd '
 			vim.cmd(cmd_open .. vim.fn.fnameescape(file_data.path))
+
+			-- restore view of focused file
+			if file_data.focused == 1 then
+				vim.api.nvim_win_set_cursor(0, {file_data.cursor.line, file_data.cursor.col})
+				vim.fn.winrestview({topline = file_data.topline})
+			end
 		end
 	end
 end
