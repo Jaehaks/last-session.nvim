@@ -86,4 +86,52 @@ M.load_session = function()
 	end
 end
 
+-- View last-session file
+M.view_session = function ()
+	local options = config.get_config()
+    local session_file = options.path
+
+    -- Check whether session_file exists
+    if vim.fn.filereadable(session_file) ~= 1 then
+        vim.api.nvim_echo({{'Error: No session file: ' .. session_file}}, false, {err = true})
+        return
+    end
+
+    -- Check whether 'jq' is installed
+    if not vim.fn.executable('jq') then
+        vim.api.nvim_echo({{'Error: jq not installed'}}, false, {err = true})
+        return
+    end
+
+    -- create new buffer
+    local bufnr = vim.api.nvim_create_buf(false, true) -- 스크래치 버퍼, nobuflisted
+    -- vim.api.nvim_buf_set_name(bufnr, '[Last Session JSON]')
+    vim.api.nvim_buf_set_name(bufnr, '[View] ' .. vim.fn.fnamemodify(session_file, ':~'))
+
+    -- read output of jq
+    local output = vim.fn.systemlist('jq . ' .. vim.fn.shellescape(session_file))
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({{'Error: jq failed to read ' .. session_file}}, false, {err = true})
+        vim.api.nvim_buf_delete(bufnr, { force = true })
+        return
+    end
+
+	-- remove carriage return
+	for i, line in ipairs(output) do
+		output[i] = line:gsub('\r', '')
+	end
+
+    -- write the contents to buffer
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, output)
+	vim.api.nvim_set_option_value('filetype', 'json', { buf = bufnr })
+	vim.api.nvim_set_option_value('buftype', 'nofile', { buf = bufnr })
+	vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = bufnr })
+	vim.api.nvim_set_current_buf(bufnr)
+	vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })
+
+    -- set new keymap for current buffer
+    vim.keymap.set('n', 'q', ':bd<CR>', { buffer = bufnr, noremap = true, silent = true })
+end
+
+
 return M

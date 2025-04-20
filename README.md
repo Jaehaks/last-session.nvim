@@ -64,4 +64,15 @@ It is table which includes filetype, extension or directory string pattern to ig
 | `session.save_session()` | Save current tab session to file   |
 | `session.load_session()` | Load current tab session from file |
 
+### Command
+
+|      Command       | behavior                                   |
+| :----------------: | ------------------------------------------ |
+| `:LastSessionView` | Show contents of saved session file (json) |
+|                    | Read only, 'q' to quit                     |
+
+
+
+
+
 

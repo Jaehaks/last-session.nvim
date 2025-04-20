@@ -10,6 +10,10 @@ M.load_session = function ()
 	require('last-session.sessions').load_session()
 end
 
+M.view_session = function ()
+	require('last-session.sessions').view_session()
+end
+
 -- setup
 M.setup = function(opts)
 	config.setup(opts or {})
@@ -25,6 +29,8 @@ M.setup = function(opts)
 			desc = 'Auto-save session before exiting Neovim',
 		})
 	end
+
+	vim.api.nvim_create_user_command('LastSessionView', M.view_session, { desc = 'View Last-session file' })
 end
 
 return M
