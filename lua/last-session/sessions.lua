@@ -26,7 +26,7 @@ M.save_session = function()
 	local session_data = {}                              -- total file_data list of opened buffer
 
 	for _, bufnr in ipairs(buffers) do -- get buffer number
-		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, 'buflisted') then -- check the buffer is opened
+		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr}) then -- check the buffer is opened
 			local file_path = utils.filter_ignored(bufnr)
 			if file_path then
 				local file_data = { -- window data of opened buffer
