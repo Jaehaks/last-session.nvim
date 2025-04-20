@@ -1,5 +1,15 @@
 # ChnageLog
 
+## 2025-04-20 (2)
+
+### Features
+- Sessions are saved based on window not buffer. [e08d1f8](https://github.com/Jaehaks/last-session.nvim/commit/e08d1f86571b753161d1fae80d6c616f2707faf5)
+	- `last-session.nvim` can save window layout now
+	-  first window cannot restore topline but cursor can be that.
+
+### Bug Fixed
+- set focused_winid as winid from winnum [e08d1f8](https://github.com/Jaehaks/last-session.nvim/commit/e08d1f86571b753161d1fae80d6c616f2707faf5)
+
 ## 2025-04-20
 
 ### Features
