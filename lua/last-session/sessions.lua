@@ -19,44 +19,49 @@ M.save_session = function()
 	local session_file = options.path
 	utils.check_dir(session_dir)
 
+	-- delete ignored buffer
+	local buffers = vim.api.nvim_list_bufs()             -- get all buffer number list
+	for _, bufnr in pairs(buffers) do
+		local file_path = utils.filter_ignored(bufnr)
+		if not file_path then
+			vim.api.nvim_buf_delete(bufnr, {unload = true})
+		end
+	end
 
 	-- get list of opened buffers
 	local focused_bufnr = vim.api.nvim_get_current_buf() -- get focused file buffer number
-	local buffers = vim.api.nvim_list_bufs()             -- get all buffer number list
 	local session_data = {}                              -- total file_data list of opened buffer
 
 	local has_focused = false
 	for _, bufnr in ipairs(buffers) do -- get buffer number
 		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr}) then -- check the buffer is opened
-			local file_path = utils.filter_ignored(bufnr)
-			if file_path then
-				-- get window information
-				local winid   = vim.fn.bufwinid(bufnr)
-				local cursor  = {1, 0}
-				local topline = 1
-				if winid >= 0 then                              -- if the window is visible
-					cursor  = vim.api.nvim_win_get_cursor(winid) -- get current cursor location {row, col-1}
-					topline = vim.fn.line('w0',winid)           -- get current top line number
-				end
-
-				-- save buffer information
-				local file_data = { -- window data of opened buffer
-					bufnr   = bufnr,
-					winid   = winid,
-					focused = bufnr == focused_bufnr and 1 or 0,
-					path    = file_path:gsub(sep1, sep2), -- unify the separator
-					cursor  = {
-						line = cursor[1],
-						col  = cursor[2],
-					},
-					topline = topline,
-				}
-
-				if file_data.focused == 1 then
-					has_focused = true
-				end
-				table.insert(session_data, file_data)
+			local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
+			-- get window information
+			local winid   = vim.fn.bufwinid(bufnr)
+			local cursor  = {1, 0}
+			local topline = 1
+			if winid >= 0 then                              -- if the window is visible
+				cursor  = vim.api.nvim_win_get_cursor(winid) -- get current cursor location {row, col-1}
+				topline = vim.fn.line('w0',winid)           -- get current top line number
 			end
+
+			-- save buffer information
+			local file_data = { -- window data of opened buffer
+				bufnr   = bufnr,
+				winid   = winid,
+				focused = bufnr == focused_bufnr and 1 or 0,
+				path    = file_path:gsub(sep1, sep2), -- unify the separator
+				cursor  = {
+					line = cursor[1],
+					col  = cursor[2],
+				},
+				topline = topline,
+			}
+
+			if file_data.focused == 1 then
+				has_focused = true
+			end
+			table.insert(session_data, file_data)
 		end
 	end
 
