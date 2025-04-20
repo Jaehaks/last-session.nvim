@@ -25,6 +25,7 @@ M.save_session = function()
 	local buffers = vim.api.nvim_list_bufs()             -- get all buffer number list
 	local session_data = {}                              -- total file_data list of opened buffer
 
+	local has_focused = false
 	for _, bufnr in ipairs(buffers) do -- get buffer number
 		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr}) then -- check the buffer is opened
 			local file_path = utils.filter_ignored(bufnr)
@@ -34,9 +35,17 @@ M.save_session = function()
 					focused = bufnr == focused_bufnr and 1 or 0,
 					path    = file_path:gsub(sep1, sep2) -- unify the separator
 				}
+				if file_data.focused == 1 then
+					has_focused = true
+				end
 				table.insert(session_data, file_data)
 			end
 		end
+	end
+
+	-- if there is no focused file, first file is focused
+	if not has_focused and #session_data > 0 then
+		session_data[1].focused = 1
 	end
 
 	-- save session
