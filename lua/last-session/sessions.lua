@@ -58,7 +58,7 @@ M.load_session = function()
 
 	-- check if session file is exists
 	if vim.fn.filereadable(session_file) ~= 1 then
-		vim.api.nvim_echo({{'No session file found at ' .. session_file}}, false, {err = true})
+		vim.api.nvim_echo({{'Error: No session file found at ' .. session_file}}, false, {err = true})
 		return
 	end
 
