@@ -155,7 +155,7 @@ M.load_session = function()
 		vim.api.nvim_set_current_win(winid)
 		vim.fn.winrestview({topline = win_data.topline}) -- winrestview needs to set current win
 		if win_data.focused == 1 then
-			focused_winid = win_data.winid
+			focused_winid = winid
 		end
 		-- vim.print({winid, bufnr, win_data.cursor, win_data.topline})
 	end
