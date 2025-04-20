@@ -44,4 +44,16 @@ M.filter_ignored = function(bufnr)
 	return file_path
 end
 
+---@param bufnr number target buffer to get bufindex
+---@param buffers table session_data.buffers
+---@return number|nil order index in session_data.buffers who matches with bufnr
+M.get_bufidx = function (bufnr, buffers)
+	for i, buffer in ipairs(buffers) do
+		if buffer.bufnr == bufnr then
+			return i
+		end
+	end
+	return nil
+end
+
 return M

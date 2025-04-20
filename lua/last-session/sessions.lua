@@ -29,45 +29,58 @@ M.save_session = function()
 	end
 
 	-- get list of opened buffers
-	local focused_bufnr = vim.api.nvim_get_current_buf() -- get focused file buffer number
-	local session_data = {}                              -- total file_data list of opened buffer
+	local session_data = {                               -- total file_data list of opened buffer
+		buffers = {},                                    -- opened buffer data
+		windows = {},                                    -- window data
+		layout = vim.fn.winlayout()                      -- row/col Hierarchy
+	}
 
-	local has_focused = false
 	for _, bufnr in ipairs(buffers) do -- get buffer number
 		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr}) then -- check the buffer is opened
 			local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
-			-- get window information
-			local winid   = vim.fn.bufwinid(bufnr)
-			local cursor  = {1, 0}
-			local topline = 1
-			if winid >= 0 then                              -- if the window is visible
-				cursor  = vim.api.nvim_win_get_cursor(winid) -- get current cursor location {row, col-1}
-				topline = vim.fn.line('w0',winid)           -- get current top line number
-			end
-
 			-- save buffer information
-			local file_data = { -- window data of opened buffer
+			local file_data = {
 				bufnr   = bufnr,
-				winid   = winid,
-				focused = bufnr == focused_bufnr and 1 or 0,
 				path    = file_path:gsub(sep1, sep2), -- unify the separator
-				cursor  = {
-					line = cursor[1],
-					col  = cursor[2],
-				},
-				topline = topline,
 			}
-
-			if file_data.focused == 1 then
-				has_focused = true
-			end
-			table.insert(session_data, file_data)
+			table.insert(session_data.buffers, file_data)
 		end
 	end
 
+	-- get current window layout
+	local has_focused = false
+	local focused_winid = vim.api.nvim_get_current_win() -- get focused winid
+	local wins = vim.api.nvim_list_wins() -- get all winid
+	for _, winid in ipairs(wins) do
+		local bufnr = vim.api.nvim_win_get_buf(winid)
+		local winnum = vim.api.nvim_win_get_number(winid)
+		local curosr = vim.api.nvim_win_get_cursor(winid)
+		local topline = vim.fn.line('w0', winid)
+		local bufidx = utils.get_bufidx(bufnr, session_data.buffers)
+		local win_data = {
+			winid = winid,
+			winnum = winnum,
+			bufnr = bufnr,
+			bufidx = bufidx,
+			focused = winid == focused_winid and 1 or 0,
+			cursor = {
+				line = curosr[1],
+				col = curosr[2],
+			},
+			topline = topline,
+		}
+		table.insert(session_data.windows, win_data)
+
+		if win_data.focused == 1 then
+			has_focused = true
+		end
+	end
+
+
+
 	-- if there is no focused file, first file is focused
 	if not has_focused and #session_data > 0 then
-		session_data[1].focused = 1
+		session_data.windows[1].focused = 1
 	end
 
 	-- save session
@@ -108,19 +121,45 @@ M.load_session = function()
 	end
 
 	-- load buffers
-	for _, file_data in ipairs(session_data) do
+	for i, file_data in ipairs(session_data.buffers) do
 		if vim.fn.filereadable(file_data.path) == 1 then
-			-- edit only focused file to fast load
-			local cmd_open = file_data.focused == 1 and 'edit ' or 'badd '
-			vim.cmd(cmd_open .. vim.fn.fnameescape(file_data.path))
+			-- add all session buffers with unload state
+			local bufnr = vim.fn.bufadd(file_data.path)
+			vim.api.nvim_set_option_value('buflisted', true, {buf = bufnr})
+			session_data.buffers[i].bufnr = bufnr
+		end
+	end
 
-			-- restore view of focused file
-			if file_data.focused == 1 then
-				vim.api.nvim_win_set_cursor(0, {file_data.cursor.line, file_data.cursor.col})
-				vim.fn.winrestview({topline = file_data.topline})
+	-- set layout
+	local function create_layout(layout)
+		if layout[1] == 'row' or layout[1] == 'col' then
+			local split_cmd = layout[1] == 'row' and 'vsplit' or 'split'
+			local child = layout[2]
+
+			create_layout(child[1])
+			for i = 2, #child do
+				vim.cmd(split_cmd)
+				create_layout(child[i])
 			end
 		end
 	end
+	create_layout(session_data.layout)
+
+	-- open visible buffer
+	local focused_winid = 0
+	for _, win_data in ipairs(session_data.windows) do
+		local winid = vim.fn.win_getid(win_data.winnum)
+		local bufnr = session_data.buffers[win_data.bufidx].bufnr
+		vim.api.nvim_win_set_buf(winid, bufnr)
+		vim.api.nvim_win_set_cursor(winid, {win_data.cursor.line, win_data.cursor.col})
+		vim.api.nvim_set_current_win(winid)
+		vim.fn.winrestview({topline = win_data.topline}) -- winrestview needs to set current win
+		if win_data.focused == 1 then
+			focused_winid = win_data.winid
+		end
+		-- vim.print({winid, bufnr, win_data.cursor, win_data.topline})
+	end
+	vim.api.nvim_set_current_win(focused_winid)
 end
 
 -- View last-session file
@@ -140,16 +179,10 @@ M.view_session = function ()
         return
     end
 
-    -- create new buffer
-    local bufnr = vim.api.nvim_create_buf(false, true) -- 스크래치 버퍼, nobuflisted
-    -- vim.api.nvim_buf_set_name(bufnr, '[Last Session JSON]')
-    vim.api.nvim_buf_set_name(bufnr, '[View] ' .. vim.fn.fnamemodify(session_file, ':~'))
-
     -- read output of jq
     local output = vim.fn.systemlist('jq . ' .. vim.fn.shellescape(session_file))
     if vim.v.shell_error ~= 0 then
         vim.api.nvim_echo({{'Error: jq failed to read ' .. session_file}}, false, {err = true})
-        vim.api.nvim_buf_delete(bufnr, { force = true })
         return
     end
 
