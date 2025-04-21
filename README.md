@@ -20,12 +20,12 @@ It is still developing, so I'll fix it continuously until I satisfied.
 ## Installation
 
 ```lua
-	-- lazy.nvim
-	return {
-		'Jaehaks/last-session.nvim',
-			branch = 'main',
-			opts = {}
-	}
+-- lazy.nvim
+return {
+  'Jaehaks/last-session.nvim',
+  branch = 'main',
+  opts = {}
+}
 ```
 
 ## configuration
@@ -33,12 +33,12 @@ It is still developing, so I'll fix it continuously until I satisfied.
 ```lua
 -- This is default configuration
 opts = {
-	auto_save    = false,     -- save last session automatically when VimLeave
-	path         = vim.fn.stdpath('data') .. '/last-session/last-session.json',
-	ignored_list = {
-		ignored_type = {},    -- List of file extensions or filetypes to ignore
-		ignored_dir  = {},    -- List of directory path patterns to ignore
-	}
+  auto_save    = false,     -- save last session automatically when VimLeave
+  path         = vim.fn.stdpath('data') .. '/last-session/last-session.json',
+  ignored_list = {
+    ignored_type = {},    -- List of file extensions or filetypes to ignore
+    ignored_dir  = {},    -- List of directory path patterns to ignore
+  }
 }
 ```
 
@@ -46,15 +46,15 @@ opts = {
 
 It is table which includes filetype, extension or directory string pattern to ignore for session
 ```lua
-	-- example
-	ignored_list = {
-		ignored_type = {
-			'help',
-		},
-		ignored_dir = {
-			'doc\\',
-		}
-	}
+-- example
+ignored_list = {
+  ignored_type = {
+    'help',
+  },
+  ignored_dir = {
+    'doc\\',
+  }
+}
 ```
 
 ## API / Command
