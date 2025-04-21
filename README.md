@@ -70,12 +70,9 @@ ignored_list = {
 
 ### Command
 
-|      Command       | behavior                                   |
-| :----------------: | ------------------------------------------ |
-| `:LastSessionView` | Show contents of saved session file (json) |
-|                    | Read only, 'q' to quit                     |
-
-
+|      Command       | behavior                                                               |
+| :----------------: | ---------------------------------------------------------------------- |
+| `:LastSessionView` | Show contents of saved session file (json) <br> Read only, 'q' to quit |
 
 
 
