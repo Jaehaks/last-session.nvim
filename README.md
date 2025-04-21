@@ -12,6 +12,10 @@ So I made this plugin without using `:mksession` and restore opened buffer files
 
 It is still developing, so I'll fix it continuously until I satisfied.
 
+## Requirements
+
+- [Neovim v0.11.0+](https://github.com/neovim/neovim/releases)
+- [jq](https://jqlang.org/) : (optional) To view session file
 
 ## Installation
 
