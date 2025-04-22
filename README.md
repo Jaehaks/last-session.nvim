@@ -61,7 +61,7 @@ ignored_list = {
 
 ### API
 
-`session = require('last-session').save_session()`
+`session = require('last-session')`
 
 |           API            | behavior                           |
 | :----------------------: | ---------------------------------- |
