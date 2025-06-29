@@ -20,7 +20,7 @@ M.filter_ignored = function(bufnr)
 
 	-- Remove empty file path
 	if #file_path < 1 then
-		return nil
+		return "" -- no name file cannot be deleted, it must be ignored
 	end
 
 	-- if ext of file is included in ignored_type

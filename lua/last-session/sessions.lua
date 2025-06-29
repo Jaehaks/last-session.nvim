@@ -20,11 +20,17 @@ M.save_session = function()
 	utils.check_dir(session_dir)
 
 	-- delete ignored buffer
-	local buffers = vim.api.nvim_list_bufs()             -- get all buffer number list
-	for _, bufnr in pairs(buffers) do
+	local buffers = {}
+	local buflist = vim.api.nvim_list_bufs()             -- get all buffer number list
+	for _, bufnr in pairs(buflist) do
 		local file_path = utils.filter_ignored(bufnr)
 		if not file_path then
 			vim.api.nvim_buf_delete(bufnr, {unload = true})
+		elseif file_path == "" then
+			-- if file name doesn't exist like dashboard, it is ignored to insert save table
+		else
+			table.insert(buffers, bufnr)
+		end
 		end
 	end
 
