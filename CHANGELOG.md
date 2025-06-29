@@ -1,5 +1,18 @@
 # ChnageLog
 
+## 2025-06-29
+
+### Features
+- Add Vim Command for save_session() and load_session() [0ee3939](https://github.com/Jaehaks/last-session.nvim/commit/0ee393979b39733d3717cd821308edd050c815fe)
+	- `:LastSessionSave` : `require('last-session').save_session()`
+	- `:lastsessionload` : `require('last-session').load_session()`
+
+### Bug Fixed
+- Fix error about deleting buffer when no-named files are listed. [3390591](https://github.com/Jaehaks/last-session.nvim/commit/339059128940fba84d3cb2352f75f7d976f58312)
+- Don't save session file if there are no candidate files [a90dbc7](https://github.com/Jaehaks/last-session.nvim/commit/a90dbc7d2f6b00d84214a2abc598a95d378c3e4a)
+	- When I quit neovim just after dashboard is shown, it has no effect to the session file
+- Don't proceed load_session() anymore when there are no saved session [2d14691](https://github.com/Jaehaks/last-session.nvim/commit/2d146911f96fd3a3559f072ca8af0d1bc1817101)
+
 ## 2025-04-20 (2)
 
 ### Features
