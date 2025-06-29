@@ -31,7 +31,7 @@ M.save_session = function()
 		else
 			table.insert(buffers, bufnr)
 		end
-		end
+	end
 
 	-- if table is empty, don't save session file
 	if #buffers == 0 then
@@ -127,6 +127,12 @@ M.load_session = function()
 	local ok, session_data = pcall(vim.json.decode, lines[1])
 	if not ok then
 		vim.api.nvim_echo({{'Error: Invalid session file format'}}, false, {err = true})
+		return
+	end
+
+	-- check the session data is valid
+	if #session_data.buffers == 0 then
+		vim.notify('Last-session : There are no saved session', vim.log.levels.WARN )
 		return
 	end
 
