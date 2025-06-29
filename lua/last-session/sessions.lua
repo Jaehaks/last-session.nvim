@@ -89,7 +89,7 @@ M.save_session = function()
 	end)
 
 	if success then
-		print('Session saved to ' .. session_file)
+		vim.notify('Session saved to ' .. session_file, vim.log.levels.INFO )
 	else
 		vim.api.nvim_echo({{'Error: Could not write to session file'}}, false, {err = true})
 	end
