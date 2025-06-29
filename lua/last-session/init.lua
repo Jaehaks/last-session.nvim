@@ -31,6 +31,8 @@ M.setup = function(opts)
 	end
 
 	vim.api.nvim_create_user_command('LastSessionView', M.view_session, { desc = 'View Last-session file' })
+	vim.api.nvim_create_user_command('LastSessionSave', M.save_session, { desc = 'Save Last-session file' })
+	vim.api.nvim_create_user_command('LastSessionLoad', M.load_session, { desc = 'Load Last-session file' })
 end
 
 return M
