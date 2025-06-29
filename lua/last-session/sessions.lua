@@ -32,6 +32,10 @@ M.save_session = function()
 			table.insert(buffers, bufnr)
 		end
 		end
+
+	-- if table is empty, don't save session file
+	if #buffers == 0 then
+		return
 	end
 
 	-- get list of opened buffers
