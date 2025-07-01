@@ -130,12 +130,6 @@ M.load_session = function()
 		return
 	end
 
-	-- check the session data is valid
-	if #session_data.buffers == 0 then
-		vim.notify('Last-session : There are no saved session', vim.log.levels.WARN )
-		return
-	end
-
 	-- load buffers
 	for i, file_data in ipairs(session_data.buffers) do
 		if vim.fn.filereadable(file_data.path) == 1 then
@@ -144,6 +138,12 @@ M.load_session = function()
 			vim.api.nvim_set_option_value('buflisted', true, {buf = bufnr})
 			session_data.buffers[i].bufnr = bufnr
 		end
+	end
+
+	-- check the session data is valid
+	if #session_data.buffers == 0 then
+		vim.notify('Last-session : There are no saved session', vim.log.levels.WARN )
+		return
 	end
 
 	-- set layout
