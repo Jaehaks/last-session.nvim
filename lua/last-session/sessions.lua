@@ -46,15 +46,13 @@ M.save_session = function()
 	}
 
 	for _, bufnr in ipairs(buffers) do -- get buffer number
-		if vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr}) then -- check the buffer is opened
-			local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
-			-- save buffer information
-			local file_data = {
-				bufnr   = bufnr,
-				path    = file_path:gsub(sep1, sep2), -- unify the separator
-			}
-			table.insert(session_data.buffers, file_data)
-		end
+		local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
+		-- save buffer information
+		local file_data = {
+			bufnr   = bufnr,
+			path    = file_path:gsub(sep1, sep2), -- unify the separator
+		}
+		table.insert(session_data.buffers, file_data)
 	end
 
 	-- get current window layout
@@ -79,7 +77,12 @@ M.save_session = function()
 			},
 			topline = topline,
 		}
-		table.insert(session_data.windows, win_data)
+
+		-- check win_data is valid. Sometimes nvim_list_wins() includes invisible [SCRATCH] buffer
+		local file_path = utils.filter_ignored(bufnr)
+		if not file_path or #file_path > 0 then
+			table.insert(session_data.windows, win_data)
+		end
 
 		if win_data.focused == 1 then
 			has_focused = true
@@ -128,6 +131,12 @@ M.load_session = function()
 	if not ok then
 		vim.api.nvim_echo({{'Error: Invalid session file format'}}, false, {err = true})
 		return
+	end
+
+	-- delete current session
+	local buflist = vim.api.nvim_list_bufs()             -- get all buffer number list
+	for _, bufnr in pairs(buflist) do
+		vim.api.nvim_buf_delete(bufnr, {unload = true})
 	end
 
 	-- load buffers

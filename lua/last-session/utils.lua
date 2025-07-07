@@ -18,6 +18,11 @@ M.filter_ignored = function(bufnr)
 
 	if not options then return nil end
 
+	-- Remove unloaded / unlisted buffer
+	if not (vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_get_option_value('buflisted', {buf = bufnr})) then -- check the buffer is opened
+		return ""
+	end
+
 	-- Remove empty file path
 	if #file_path < 1 then
 		return "" -- no name file cannot be deleted, it must be ignored
