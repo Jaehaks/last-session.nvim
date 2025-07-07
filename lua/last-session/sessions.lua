@@ -133,11 +133,34 @@ M.load_session = function()
 		return
 	end
 
-	-- delete current session
-	local buflist = vim.api.nvim_list_bufs()             -- get all buffer number list
-	for _, bufnr in pairs(buflist) do
-		vim.api.nvim_buf_delete(bufnr, {unload = true})
+	-- get current opened buffer list to close them
+	local buffers = vim.api.nvim_list_bufs() -- get opened buffer before load session
+	local buffers_fordelete = {}
+	for _, bufnr in ipairs(buffers) do -- get buffer number
+		local file_path = utils.filter_ignored(bufnr)
+		vim.print(file_path)
+		if file_path and file_path ~= "" then
+			local file_data = {
+				bufnr   = bufnr,
+				path    = file_path:gsub(sep1, sep2), -- unify the separator
+			}
+			table.insert(buffers_fordelete, file_data)
+		end
 	end
+
+	-- check duplicate items between buffers_fordelete and session_data.buffers
+	local hash = {}
+	for _, buffer in ipairs(session_data.buffers) do
+		hash[buffer.path] = true -- session_data.buffers are always valid
+	end
+
+	for i = #buffers_fordelete, 1, -1 do -- reverse order to prevent changing index when item is removed in table
+		local item = buffers_fordelete[i]
+		if hash[item.path] then
+			table.remove(buffers_fordelete, i)
+		end
+	end
+
 
 	-- load buffers
 	for i, file_data in ipairs(session_data.buffers) do
@@ -185,6 +208,11 @@ M.load_session = function()
 		-- vim.print({winid, bufnr, win_data.cursor, win_data.topline})
 	end
 	vim.api.nvim_set_current_win(focused_winid)
+
+	-- delete current session
+	for _, buffer in pairs(buffers_fordelete) do
+		vim.api.nvim_buf_delete(buffer.bufnr, {unload = false}) -- wipe buffer
+	end
 end
 
 -- View last-session file
