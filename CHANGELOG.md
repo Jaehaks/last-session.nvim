@@ -1,5 +1,17 @@
 # ChnageLog
 
+## 2025-07-07
+
+### Features
+- Remove current session when `load_session()` is executed [167e8c0](https://github.com/Jaehaks/last-session.nvim/commit/167e8c01b0c033ce2427a05197b05d7640d63e05)
+	- After load session, close buffers in before session
+
+### Bug Fixed
+- Bug fix about ghost window [bc55589](https://github.com/Jaehaks/last-session.nvim/commit/bc555899dc877756e44af0b3f69017ddd9c66f52)
+	- Sometimes, although neovim had only one window and it focused, there are two `windows` data in session_data file
+	- It makes error when I load session because there are no valid buffer in one `windows` data
+	- Remove invalid window when `save_session()` is executed
+
 ## 2025-06-29
 
 ### Features
