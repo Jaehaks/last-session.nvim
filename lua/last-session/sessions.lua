@@ -47,9 +47,11 @@ M.save_session = function()
 
 	for _, bufnr in ipairs(buffers) do -- get buffer number
 		local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
+		local lnum = vim.fn.getbufinfo(bufnr)[1].lnum
 		-- save buffer information
 		local file_data = {
 			bufnr   = bufnr,
+			lnum    = lnum,
 			path    = file_path:gsub(sep1, sep2), -- unify the separator
 		}
 		table.insert(session_data.buffers, file_data)
@@ -163,12 +165,23 @@ M.load_session = function()
 
 
 	-- load buffers
+	vim.api.nvim_create_augroup('LastSession_BufWinEnter', {clear = true})
 	for i, file_data in ipairs(session_data.buffers) do
 		if vim.fn.filereadable(file_data.path) == 1 then
 			-- add all session buffers with unload state
 			local bufnr = vim.fn.bufadd(file_data.path)
 			vim.api.nvim_set_option_value('buflisted', true, {buf = bufnr})
 			session_data.buffers[i].bufnr = bufnr
+
+			-- reload cursor location of all buffer
+			vim.api.nvim_create_autocmd({'BufWinEnter'}, {
+				group = 'LastSession_BufWinEnter',
+				buffer = bufnr,
+				once = true,
+				callback = function ()
+					vim.api.nvim_win_set_cursor(0, {file_data.lnum, 0})
+				end
+			})
 		end
 	end
 

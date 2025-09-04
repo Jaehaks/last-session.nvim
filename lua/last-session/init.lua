@@ -21,8 +21,9 @@ M.setup = function(opts)
 	-- If auto_save is true, save the session before exiting Neovim.
 	local options = config.get_config()
 	if options.auto_save then
+		vim.api.nvim_create_augroup('LastSession_VimLeavePre', { clear = true })
 		vim.api.nvim_create_autocmd('VimLeavePre', {
-			group = vim.api.nvim_create_augroup('LastSession', { clear = true }),
+			group = 'LastSession_VimLeavePre',
 			callback = function ()
 				M.save_session()
 			end,
