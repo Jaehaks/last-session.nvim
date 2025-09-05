@@ -49,7 +49,7 @@ M.save_session = function()
 	}
 
 	local function get_filedata(filepath)
-		if #loaded_session_data.buffers == 0 then
+		if not loaded_session_data.buffers then
 			return nil
 		end
 		for _, file in ipairs(loaded_session_data.buffers) do
