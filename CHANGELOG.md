@@ -9,7 +9,7 @@
 	- Due to limit of `getbufinfo()`, row number of cursor location which are not shown at last window is restored only.
 
 ### Bug Fixed
-- Bug fix for [42886e4](https://github.com/Jaehaks/last-session.nvim/commit/42886e49a54b1df74df76966a67270394a2d8409) at [0f8580e](https://github.com/Jaehaks/last-session.nvim/commit/0f8580ef9fcf86f9d3e2e879267dfdea510d86cb)
+- Bug fix for [42886e4](https://github.com/Jaehaks/last-session.nvim/commit/42886e49a54b1df74df76966a67270394a2d8409) at [056f29e](https://github.com/Jaehaks/last-session.nvim/commit/056f29e850fa8e91369672a7e55651af5aee74f9)
 	- Save cursor position even though some buffers are listed but not loaded from session file.
 
 ## 2025-07-07
