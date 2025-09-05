@@ -49,6 +49,9 @@ M.save_session = function()
 	}
 
 	local function get_filedata(filepath)
+		if #loaded_session_data == 0 then
+			return nil
+		end
 		for _, file in ipairs(loaded_session_data.buffers) do
 			if file.path == filepath then
 				return file
@@ -155,7 +158,6 @@ M.load_session = function()
 	local buffers_fordelete = {}
 	for _, bufnr in ipairs(buffers) do -- get buffer number
 		local file_path = utils.filter_ignored(bufnr)
-		vim.print(file_path)
 		if file_path and file_path ~= "" then
 			local file_data = {
 				bufnr   = bufnr,
