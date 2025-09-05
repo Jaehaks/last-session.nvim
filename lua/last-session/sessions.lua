@@ -10,6 +10,9 @@ if isWin == 1 then
 	sep1, sep2 = '/', '\\'
 end
 
+-- loaded data
+local loaded_session_data = {}
+
 -- Save current opened buffer list
 M.save_session = function()
 	local options = config.get_config()
@@ -45,14 +48,25 @@ M.save_session = function()
 		layout = vim.fn.winlayout()                      -- row/col Hierarchy
 	}
 
+	local function get_filedata(filepath)
+		for _, file in ipairs(loaded_session_data.buffers) do
+			if file.path == filepath then
+				return file
+			end
+		end
+		return nil
+	end
 	for _, bufnr in ipairs(buffers) do -- get buffer number
 		local file_path = vim.api.nvim_buf_get_name(bufnr) -- get absolute path
-		local lnum = vim.fn.getbufinfo(bufnr)[1].lnum
+		file_path = file_path:gsub(sep1, sep2) -- unify the separator
+		local bufinfo = vim.fn.getbufinfo(bufnr)[1]
+		local loaded_file_data = get_filedata(file_path)
+		local lnum = bufinfo.loaded == 1 and bufinfo.lnum or (loaded_file_data and loaded_file_data.lnum or 0)
 		-- save buffer information
 		local file_data = {
 			bufnr   = bufnr,
 			lnum    = lnum,
-			path    = file_path:gsub(sep1, sep2), -- unify the separator
+			path    = file_path,
 		}
 		table.insert(session_data.buffers, file_data)
 	end
@@ -134,6 +148,7 @@ M.load_session = function()
 		vim.api.nvim_echo({{'Error: Invalid session file format'}}, false, {err = true})
 		return
 	end
+	loaded_session_data = session_data -- update session data
 
 	-- get current opened buffer list to close them
 	local buffers = vim.api.nvim_list_bufs() -- get opened buffer before load session
@@ -152,8 +167,8 @@ M.load_session = function()
 
 	-- check duplicate items between buffers_fordelete and session_data.buffers
 	local hash = {}
-	for _, buffer in ipairs(session_data.buffers) do
-		hash[buffer.path] = true -- session_data.buffers are always valid
+	for _, buffer in ipairs(loaded_session_data.buffers) do
+		hash[buffer.path] = true -- loaded_session_data.buffers are always valid
 	end
 
 	for i = #buffers_fordelete, 1, -1 do -- reverse order to prevent changing index when item is removed in table
@@ -166,12 +181,12 @@ M.load_session = function()
 
 	-- load buffers
 	vim.api.nvim_create_augroup('LastSession_BufWinEnter', {clear = true})
-	for i, file_data in ipairs(session_data.buffers) do
+	for i, file_data in ipairs(loaded_session_data.buffers) do
 		if vim.fn.filereadable(file_data.path) == 1 then
 			-- add all session buffers with unload state
 			local bufnr = vim.fn.bufadd(file_data.path)
 			vim.api.nvim_set_option_value('buflisted', true, {buf = bufnr})
-			session_data.buffers[i].bufnr = bufnr
+			loaded_session_data.buffers[i].bufnr = bufnr
 
 			-- reload cursor location of all buffer
 			vim.api.nvim_create_autocmd({'BufWinEnter'}, {
@@ -186,7 +201,7 @@ M.load_session = function()
 	end
 
 	-- check the session data is valid
-	if #session_data.buffers == 0 then
+	if #loaded_session_data.buffers == 0 then
 		vim.notify('Last-session : There are no saved session', vim.log.levels.WARN )
 		return
 	end
@@ -204,13 +219,13 @@ M.load_session = function()
 			end
 		end
 	end
-	create_layout(session_data.layout)
+	create_layout(loaded_session_data.layout)
 
 	-- open visible buffer
 	local focused_winid = 0
-	for _, win_data in ipairs(session_data.windows) do
+	for _, win_data in ipairs(loaded_session_data.windows) do
 		local winid = vim.fn.win_getid(win_data.winnum)
-		local bufnr = session_data.buffers[win_data.bufidx].bufnr
+		local bufnr = loaded_session_data.buffers[win_data.bufidx].bufnr
 		vim.api.nvim_win_set_buf(winid, bufnr)
 		vim.api.nvim_win_set_cursor(winid, {win_data.cursor.line, win_data.cursor.col})
 		vim.api.nvim_set_current_win(winid)
