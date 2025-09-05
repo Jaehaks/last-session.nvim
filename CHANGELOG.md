@@ -2,11 +2,15 @@
 
 ## 2025-07-07
 
-### Bug Fixed
-- Bug fix about problem with not remembering the cursor line position of all buffers [42886e4](https://github.com/Jaehaks/last-session.nvim/commit/42886e49a54b1df74df76966a67270394a2d8409).
+### Features
+- Remember the cursor line position of all buffers when session is loaded [42886e4](https://github.com/Jaehaks/last-session.nvim/commit/42886e49a54b1df74df76966a67270394a2d8409).
 	- `last-session.nvim` remembers cursor location of last focused window only before.
 	- Now, It takes cursor to last located position for all buffers.
 	- Due to limit of `getbufinfo()`, row number of cursor location which are not shown at last window is restored only.
+
+### Bug Fixed
+- Bug fix for [42886e4](https://github.com/Jaehaks/last-session.nvim/commit/42886e49a54b1df74df76966a67270394a2d8409) at [0f8580e](https://github.com/Jaehaks/last-session.nvim/commit/0f8580ef9fcf86f9d3e2e879267dfdea510d86cb)
+	- Save cursor position even though some buffers are listed but not loaded from session file.
 
 ## 2025-07-07
 
