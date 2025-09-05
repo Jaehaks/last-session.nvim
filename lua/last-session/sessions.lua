@@ -49,7 +49,7 @@ M.save_session = function()
 	}
 
 	local function get_filedata(filepath)
-		if #loaded_session_data == 0 then
+		if #loaded_session_data.buffers == 0 then
 			return nil
 		end
 		for _, file in ipairs(loaded_session_data.buffers) do
@@ -64,7 +64,7 @@ M.save_session = function()
 		file_path = file_path:gsub(sep1, sep2) -- unify the separator
 		local bufinfo = vim.fn.getbufinfo(bufnr)[1]
 		local loaded_file_data = get_filedata(file_path)
-		local lnum = bufinfo.loaded == 1 and bufinfo.lnum or (loaded_file_data and loaded_file_data.lnum or 0)
+		local lnum = bufinfo.loaded == 1 and bufinfo.lnum or (loaded_file_data and loaded_file_data.lnum or 1)
 		-- save buffer information
 		local file_data = {
 			bufnr   = bufnr,
