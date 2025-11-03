@@ -65,6 +65,8 @@ M.save_session = function()
 		local bufinfo = vim.fn.getbufinfo(bufnr)[1]
 		local loaded_file_data = get_filedata(file_path)
 		local lnum = bufinfo.loaded == 1 and bufinfo.lnum or (loaded_file_data and loaded_file_data.lnum or 1)
+		local lc = vim.api.nvim_buf_line_count(bufnr)
+		lnum = (lnum < 1 or lc < lnum) and 1 or lnum
 		-- save buffer information
 		local file_data = {
 			bufnr   = bufnr,
